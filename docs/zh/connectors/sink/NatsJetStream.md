@@ -85,6 +85,10 @@ native 模式中的 message ID 只能作为 **broker 侧的重复缓解提示**�
 - `token` 不能与 `username` / `password` 同时配置。
 - `password` 和 `token` 都属于敏感配置，不应出现在共享配置文件或日志中。
 
+### url [string]
+
+- 必填，且不能为空。缺失或为空的 `url` 会在作业启动前导致配置校验失败。
+
 ### subject [string]
 
 - 在 `json` 格式下必须配置。

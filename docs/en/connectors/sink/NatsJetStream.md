@@ -85,6 +85,10 @@ If the stream does not exist, JetStream is disabled, or the subject is not bound
 - Do not configure `token` together with `username` / `password`.
 - Treat `password` and `token` as sensitive options and do not expose them in shared configs or logs.
 
+### url [string]
+
+- Required, and it must not be blank. A missing or blank `url` fails configuration validation before the job starts.
+
 ### subject [string]
 
 - Required in `json` format.

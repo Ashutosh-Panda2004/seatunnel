@@ -18,6 +18,9 @@
 package org.apache.seatunnel.connectors.seatunnel.natsjetstream.sink;
 
 import org.apache.seatunnel.api.configuration.ReadonlyConfig;
+import org.apache.seatunnel.api.configuration.util.ConfigValidator;
+import org.apache.seatunnel.api.configuration.util.OptionRule;
+import org.apache.seatunnel.api.configuration.util.OptionValidationException;
 import org.apache.seatunnel.api.table.catalog.CatalogTable;
 import org.apache.seatunnel.api.table.catalog.Column;
 import org.apache.seatunnel.api.table.catalog.PhysicalColumn;
@@ -48,6 +51,44 @@ class NatsJetStreamSinkFactoryTest {
         Assertions.assertNotNull(factory.optionRule());
         Assertions.assertEquals(
                 NatsJetStreamSinkOptions.CONNECTOR_IDENTITY, factory.factoryIdentifier());
+    }
+
+    @Test
+    void optionRuleAcceptsValidUrl() {
+        OptionRule rule = factory.optionRule();
+
+        Assertions.assertDoesNotThrow(
+                () -> ConfigValidator.of(ReadonlyConfig.fromMap(validJsonConfig())).validate(rule));
+
+        Map<String, Object> padded = validJsonConfig();
+        padded.put(NatsJetStreamSinkOptions.URL.key(), "  nats://127.0.0.1:4222  ");
+        Assertions.assertDoesNotThrow(
+                () -> ConfigValidator.of(ReadonlyConfig.fromMap(padded)).validate(rule));
+    }
+
+    @Test
+    void optionRuleRejectsMissingOrBlankUrl() {
+        OptionRule rule = factory.optionRule();
+
+        Map<String, Object> missing = validJsonConfig();
+        missing.remove(NatsJetStreamSinkOptions.URL.key());
+        Assertions.assertThrows(
+                OptionValidationException.class,
+                () -> ConfigValidator.of(ReadonlyConfig.fromMap(missing)).validate(rule));
+
+        assertRuleRejectsUrl(rule, "");
+        assertRuleRejectsUrl(rule, "   ");
+    }
+
+    private void assertRuleRejectsUrl(OptionRule rule, String url) {
+        Map<String, Object> config = validJsonConfig();
+        config.put(NatsJetStreamSinkOptions.URL.key(), url);
+        OptionValidationException exception =
+                Assertions.assertThrows(
+                        OptionValidationException.class,
+                        () -> ConfigValidator.of(ReadonlyConfig.fromMap(config)).validate(rule));
+        Assertions.assertTrue(exception.getMessage().contains("url"));
+        Assertions.assertTrue(exception.getMessage().contains("is not blank"));
     }
 
     @Test

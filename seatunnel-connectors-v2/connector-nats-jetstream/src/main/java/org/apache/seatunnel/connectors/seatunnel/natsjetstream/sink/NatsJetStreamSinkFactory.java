@@ -17,6 +17,8 @@
 
 package org.apache.seatunnel.connectors.seatunnel.natsjetstream.sink;
 
+import static org.apache.seatunnel.api.configuration.util.Conditions.notBlank;
+
 import org.apache.seatunnel.api.configuration.ReadonlyConfig;
 import org.apache.seatunnel.api.configuration.util.OptionRule;
 import org.apache.seatunnel.api.table.catalog.CatalogTable;
@@ -39,7 +41,7 @@ public class NatsJetStreamSinkFactory implements TableSinkFactory {
     @Override
     public OptionRule optionRule() {
         return OptionRule.builder()
-                .required(NatsJetStreamSinkOptions.URL)
+                .required(NatsJetStreamSinkOptions.URL, notBlank(NatsJetStreamSinkOptions.URL))
                 .optional(
                         NatsJetStreamSinkOptions.USERNAME,
                         NatsJetStreamSinkOptions.PASSWORD,
